@@ -1,0 +1,11 @@
+body {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 50px;
+}
+
+.div-border {
+  border: solid 1px black;
+  width: 200px;
+  height: 350px;
+}
