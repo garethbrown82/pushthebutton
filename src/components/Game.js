@@ -13,7 +13,8 @@ export class Game extends React.Component {
             numbersToAdd: [ 1, 2, 3, 4, 5 ],
             runningTotal: 0,
             indexToDisplay: 0,
-            message: "Hello There"
+            message: "Hello There",
+            isTimerCancelled: false
         };
     }
 
@@ -48,12 +49,19 @@ export class Game extends React.Component {
     }
 
     countDown = () => {
-        if (this.state.indexToDisplay < this.state.numbersToAdd.length) {
-            console.log("start countdown for total: " + this.state.targetNumber);
+        let { indexToDisplay, 
+            numbersToAdd, 
+            targetNumber, 
+            displayedNumber, 
+            runningTotal,
+            isTimerCancelled } = this.state;
+
+        if (indexToDisplay < numbersToAdd.length && !isTimerCancelled) {
+            console.log("start countdown for total: " + targetNumber);
             setTimeout(
                 () => {               
                     this.incrementCountDownNumber();
-                    console.log(this.state.displayedNumber + " Total: " + this.state.runningTotal);
+                    console.log(displayedNumber + " Total: " + runningTotal);
                     this.countDown();
                 },
                 2000
@@ -79,7 +87,7 @@ export class Game extends React.Component {
         this.randomize();
     }
 
-    startGame = () => {     
+    startGame = () => {
         this.countDown();
     }
 
@@ -101,3 +109,6 @@ export class Game extends React.Component {
 const randomNumberBetween = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + 1;
 }
+
+
+// Still counts when reset button is pressed during the game
