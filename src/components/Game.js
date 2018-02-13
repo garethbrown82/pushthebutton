@@ -13,8 +13,9 @@ export class Game extends React.Component {
             numbersToAdd: [ 1, 2, 3, 4, 5 ],
             runningTotal: 0,
             indexToDisplay: 0,
-            message: "Hello There",
-            isTimerCancelled: false
+            message: "",
+            timeOut: 0,
+            isGamePlaying: false
         };
     }
 
@@ -22,7 +23,9 @@ export class Game extends React.Component {
         this.setState({ 
             indexToDisplay: 0,
             runningTotal: 0,
-            displayedNumber: 0
+            displayedNumber: 0,
+            isGamePlaying: false,
+            message: ""
         });
     }
 
@@ -55,21 +58,25 @@ export class Game extends React.Component {
             displayedNumber, 
             runningTotal,
             isTimerCancelled } = this.state;
+            let timeOut = 0;
 
-        if (indexToDisplay < numbersToAdd.length && !isTimerCancelled) {
+        if (indexToDisplay < numbersToAdd.length) {
             console.log("start countdown for total: " + targetNumber);
-            setTimeout(
-                () => {               
-                    this.incrementCountDownNumber();
-                    console.log(displayedNumber + " Total: " + runningTotal);
-                    this.countDown();
-                },
-                2000
-            )
+            this.setState({
+                timeOut: setTimeout(
+                    () => {               
+                        this.incrementCountDownNumber();
+                        console.log(displayedNumber + " Total: " + runningTotal);
+                        this.countDown();
+                    },
+                    2000
+                )
+            })            
         };     
     }
 
     claimAnswer = () => {
+        clearTimeout(this.state.timeOut);
         if (this.state.indexToDisplay === this.state.numbersToAdd.length-1) {
             this.setState({
                 message: "Well Done!"
@@ -83,32 +90,42 @@ export class Game extends React.Component {
     }
 
     resetGame = () => {
+        clearTimeout(this.state.timeOut);
         this.resetToZero();
         this.randomize();
     }
 
     startGame = () => {
+        this.setState({
+            isGamePlaying: true
+        });
         this.countDown();
     }
 
     render() {
-        return (
-            <div className="col-md-4 offset-md-4 text-center div-border">
-                <CountDownNumber displayedNumber={this.state.displayedNumber} />
-                <PushButton onClick={this.claimAnswer} buttonText={"STOP"} targetNumber={this.state.targetNumber}/>
-                <br />
-                <Button onClick={this.resetGame} text={"Reset Game"} /> 
-                <Button onClick={this.startGame} text={"Start Countdown"}/>
-                <br />
-                <Message message={this.state.message} />                   
-            </div>
-        )
+        let { isGamePlaying } = this.state;
+        if (isGamePlaying) {
+            return (
+                <div className="col-md-4 offset-md-4 text-center div-border">
+                    <CountDownNumber displayedNumber={this.state.displayedNumber} />
+                    <PushButton onClick={this.claimAnswer} buttonText={"STOP"} targetNumber={this.state.targetNumber}/>
+                    <br />
+                    <Button onClick={this.resetGame} text={"Reset Game"} /> 
+                    <br />
+                    <Message message={this.state.message} />
+                </div>
+            )
+        } else {
+            return (
+                <div className="col-md-4 offset-md-4 text-center div-border">
+                    <Button onClick={this.startGame} text={"Start Countdown"}/>
+                </div>               
+            )
+        }
+        
     }        
 }
 
 const randomNumberBetween = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + 1;
 }
-
-
-// Still counts when reset button is pressed during the game
