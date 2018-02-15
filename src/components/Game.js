@@ -3,6 +3,7 @@ import { PushButton } from './PushButton';
 import { CountDownNumber } from './CountDownNumber';
 import { Button } from './Button';
 import { Message } from './Message';
+import { DifficultyRadioButtons } from './DifficultyRadioButtons';
 
 export class Game extends React.Component {
     constructor(props) {
@@ -15,7 +16,8 @@ export class Game extends React.Component {
             indexToDisplay: 0,
             message: "",
             timeOut: 0,
-            isGamePlaying: false
+            isGamePlaying: false,
+            selectedDifficultyOption: "easy"
         };
     }
 
@@ -102,13 +104,17 @@ export class Game extends React.Component {
         this.countDown();
     }
 
+    handleDifficultyChange = () => {
+        // handle clicking of difficulty radio buttons here.
+    }
+
     render() {
         let { isGamePlaying } = this.state;
         if (isGamePlaying) {
             return (
                 <div className="col-md-4 offset-md-4 text-center div-border">
                     <CountDownNumber displayedNumber={this.state.displayedNumber} />
-                    <PushButton onClick={this.claimAnswer} buttonText={"STOP"} targetNumber={this.state.targetNumber}/>
+                    <PushButton onClick={this.claimAnswer} buttonText={"STOP"} targetNumber={this.state.targetNumber} />
                     <br />
                     <Button onClick={this.resetGame} text={"Reset Game"} /> 
                     <br />
@@ -118,7 +124,8 @@ export class Game extends React.Component {
         } else {
             return (
                 <div className="col-md-4 offset-md-4 text-center div-border">
-                    <Button onClick={this.startGame} text={"Start Countdown"}/>
+                    <DifficultyRadioButtons label1="Easy" label2="Medium" label3="Hard" selectedOption={this.state.selectedDifficultyOption} onChange={this.handleDifficultyChange} />
+                    <PushButton onClick={this.startGame} buttonText={"Start Countdown"} targetNumber={this.state.targetNumber} />
                 </div>               
             )
         }
