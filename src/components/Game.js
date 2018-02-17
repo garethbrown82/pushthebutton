@@ -5,26 +5,30 @@ import { Button } from './Button';
 import { Message } from './Message';
 import { DifficultyRadioButtons } from './DifficultyRadioButtons';
 import { ResetGameLink } from './ResetGameLink';
-import { EASY_MIN, EASY_MAX, MEDIUM_MIN, MEDIUM_MAX, HARD_MIN, HARD_MAX } from './DifficultyTargetMinMax';
+import { Min, Max, Speed } from './GameConstants';
+import { GameFunctions } from './GameFunctions';
 
 export class Game extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            targetNumber: 15,
+            targetNumber: 0,
             displayedNumber: 0,
-            numbersToAdd: [ 1, 2, 3, 4, 5 ],
+            numbersToAdd: [],
             runningTotal: 0,
             indexToDisplay: 0,
             message: "",
             timeOut: 0,
             isGamePlaying: false,
             selectedDifficultyOption: "easy",
-            targetNumMin: EASY_MIN,
-            targetNumMax: EASY_MAX
+            selectedSpeedOption: "slow",
+            gameSpeed: Speed.STEADY,
+            targetNumMin: Min.EASY,
+            targetNumMax: Max.EASY
         };
 
         this.handleDifficultyChange = this.handleDifficultyChange.bind(this);
+        this.handleSpeedChange = this.handleSpeedChange.bind(this);
     }
 
     resetToZero = () => {
@@ -38,13 +42,9 @@ export class Game extends React.Component {
         });
     }
 
-    randomize = () => {
-        let numTargetSplitInto = randomNumberBetween(2, 10);
-        let numbersToAdd = [];
-        for (let i=0; i < numTargetSplitInto; i++) {
-            numbersToAdd.push(randomNumberBetween(1, 20));
-        }
-        numbersToAdd.push(0);
+    setNumberSequence = () => {
+        const { targetNumMin, targetNumMax } = this.state;
+        let numbersToAdd = GameFunctions.CreateNumbersToAdd(targetNumMin, targetNumMax);
         let targetNumber = numbersToAdd.reduce((total, value) => total = total + value);
         this.setState({
             targetNumber: targetNumber,
@@ -78,7 +78,7 @@ export class Game extends React.Component {
                         console.log(displayedNumber + " Total: " + runningTotal);
                         this.countDown();
                     },
-                    2000
+                    this.state.gameSpeed
                 )
             })            
         };     
@@ -99,7 +99,7 @@ export class Game extends React.Component {
     }
 
     setNewTarget = () => {
-        this.randomize();
+        this.setNumberSequence();
     }
 
     startGame = () => {
@@ -114,16 +114,16 @@ export class Game extends React.Component {
         let max = 0;
         switch(event.target.value) {
             case "easy":
-                min = EASY_MIN;
-                max = EASY_MAX;
+                min = Min.EASY;
+                max = Max.EASY;
                 break;
             case "medium":
-                min = MEDIUM_MIN;
-                max = MEDIUM_MAX;
+                min = Min.MEDIUM;
+                max = Max.MEDIUM;
                 break;
             case "hard":
-                min = HARD_MIN;
-                max = HARD_MAX;
+                min = Min.HARD;
+                max = Max.HARD;
                 break;
             default:
                 console.error("handleDifficultyChange can only accept a string value of 'easy', 'medium' or 'hard'")
@@ -132,6 +132,27 @@ export class Game extends React.Component {
             selectedDifficultyOption: event.target.value,
             targetNumMin: min,
             targetNumMax: max
+        });
+    }
+
+    handleSpeedChange = (event) => {
+        let speed = 0;
+        switch (event.target.value) {
+            case "slow":
+                speed = Speed.SLOW;
+                break;
+            case "steady":
+                speed = Speed.STEADY;
+                break;
+            case "fast":
+                speed = Speed.FAST;
+                break;
+            default:
+                console.error("Incorrect speed value, must be 'slow', 'steady' or 'fast'. It actually is: " + event.target.value);
+        }
+        this.setState({
+            gameSpeed: speed,
+            selectedSpeedOption: event.target.value
         });
     }
 
@@ -151,10 +172,19 @@ export class Game extends React.Component {
         } else {
             return (
                 <div className="col-md-4 offset-md-4 text-center div-border">
-                    <DifficultyRadioButtons label1="Easy" label2="Medium" label3="Hard" selectedOption={this.state.selectedDifficultyOption} onChange={this.handleDifficultyChange} />
+                    <DifficultyRadioButtons label1="Easy" 
+                                            label2="Medium" 
+                                            label3="Hard"
+                                            selectedOption={this.state.selectedDifficultyOption} 
+                                            onChange={this.handleDifficultyChange} />
+                    <DifficultyRadioButtons label1="Slow"
+                                            label2="Steady"
+                                            label3="Fast"
+                                            selectedOption={this.state.selectedSpeedOption}
+                                            onChange={this.handleSpeedChange} />
                     <PushButton onClick={this.startGame} buttonText={"Start Countdown"} targetNumber={this.state.targetNumber} />
                     <ResetGameLink onClick={this.setNewTarget} />
-                    <p>Min: {this.state.targetNumMin}, Max: {this.state.targetNumMax}</p>
+                    <p>{this.state.targetNumber} </p>
                 </div>               
             )
         }
@@ -162,6 +192,3 @@ export class Game extends React.Component {
     }        
 }
 
-const randomNumberBetween = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + 1;
-}
