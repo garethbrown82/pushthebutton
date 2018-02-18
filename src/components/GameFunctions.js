@@ -15,7 +15,6 @@ export class GameFunctions {
         
         numbersToAdd.push(targetNumber - numbersToAdd.reduce((total, value) => total += value));
         numbersToAdd = removeZeros(numbersToAdd);
-        numbersToAdd.push(0);
         return numbersToAdd;
     }
 }

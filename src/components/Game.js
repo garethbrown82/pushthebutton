@@ -2,9 +2,7 @@ import * as React from 'react';
 import { PushButton } from './PushButton';
 import { CountDownNumber } from './CountDownNumber';
 import { Button } from './Button';
-import { Message } from './Message';
 import { DifficultyRadioButtons } from './DifficultyRadioButtons';
-import { ResetGameLink } from './ResetGameLink';
 import { Min, Max, Speed } from './GameConstants';
 import { GameFunctions } from './GameFunctions';
 
@@ -17,14 +15,16 @@ export class Game extends React.Component {
             numbersToAdd: [],
             runningTotal: 0,
             indexToDisplay: 0,
-            message: "",
-            timeOut: 0,
+            showNumTimeout: 0,
+            fadeTimeout: 0,
             isGamePlaying: false,
             selectedDifficultyOption: "easy",
             selectedSpeedOption: "slow",
             gameSpeed: Speed.STEADY,
             targetNumMin: Min.EASY,
-            targetNumMax: Max.EASY
+            targetNumMax: Max.EASY,
+            buttonLabel: "Start Game",
+            fadeClass: 'show'
         };
 
         this.handleDifficultyChange = this.handleDifficultyChange.bind(this);
@@ -32,13 +32,14 @@ export class Game extends React.Component {
     }
 
     resetToZero = () => {
-        clearTimeout(this.state.timeOut);
+        clearTimeout(this.state.showNumTimeout);
+        clearTimeout(this.state.fadeTimeout);
         this.setState({ 
             indexToDisplay: 0,
             runningTotal: 0,
             displayedNumber: 0,
             isGamePlaying: false,
-            message: ""
+            buttonLabel: "Start Game",
         });
     }
 
@@ -46,18 +47,41 @@ export class Game extends React.Component {
         const { targetNumMin, targetNumMax } = this.state;
         let numbersToAdd = GameFunctions.CreateNumbersToAdd(targetNumMin, targetNumMax);
         let targetNumber = numbersToAdd.reduce((total, value) => total = total + value);
+        numbersToAdd.push("Too late!");
         this.setState({
             targetNumber: targetNumber,
-            numbersToAdd: numbersToAdd
+            numbersToAdd: numbersToAdd,
+            buttonLabel: "Stop when total is: " + targetNumber
         })
     }
 
-    incrementCountDownNumber = () => {
-        this.setState((prevState) =>({
-            displayedNumber: this.state.numbersToAdd[this.state.indexToDisplay],
-            indexToDisplay: prevState.indexToDisplay + 1,
-            runningTotal: prevState.runningTotal + this.state.numbersToAdd[this.state.indexToDisplay]                    
-        }));
+    claimAnswer = () => {
+        clearTimeout(this.state.showNumTimeout);
+        if (this.state.indexToDisplay === this.state.numbersToAdd.length-1) {
+            this.setState({
+                buttonLabel: "Well Done!"
+            });
+        }
+        else {
+            this.setState({
+                buttonLabel: "Bad Luck!"
+            });
+        }
+    }
+
+    startGame = () => {
+        this.setNumberSequence();
+        setTimeout(
+            () => {
+                this.setState({
+                    isGamePlaying: true,
+                    displayedNumber: "Ready!",
+                    buttonLabel: "Total = " + this.state.targetNumber
+                });
+                this.countDown();
+            },
+            3500
+        )      
     }
 
     countDown = () => {
@@ -66,47 +90,40 @@ export class Game extends React.Component {
             targetNumber, 
             displayedNumber, 
             runningTotal,
-            isTimerCancelled } = this.state;
-            let timeOut = 0;
+            isTimerCancelled,
+            gameSpeed } = this.state;
 
         if (indexToDisplay < numbersToAdd.length) {
-            console.log("start countdown for total: " + targetNumber);
             this.setState({
-                timeOut: setTimeout(
+                fadeClass: 'show',
+                showNumTimeout: setTimeout(
                     () => {               
                         this.incrementCountDownNumber();
-                        console.log(displayedNumber + " Total: " + runningTotal);
+                        if (indexToDisplay === numbersToAdd.length-1) {
+                            this.setState({buttonLabel: "Bad Luck!"})
+                        }
                         this.countDown();
                     },
-                    this.state.gameSpeed
+                    gameSpeed
+                ),
+                fadeTimeout: setTimeout(
+                    () => {
+                        this.setState({
+                            fadeClass: 'fade'
+                        });
+                    },
+                    gameSpeed - 500
                 )
-            })            
+            });       
         };     
-    }
+    };
 
-    claimAnswer = () => {
-        clearTimeout(this.state.timeOut);
-        if (this.state.indexToDisplay === this.state.numbersToAdd.length-1) {
-            this.setState({
-                message: "Well Done!"
-            });
-        }
-        else {
-            this.setState({
-                message: "Bad Luck!"
-            });
-        }
-    }
-
-    setNewTarget = () => {
-        this.setNumberSequence();
-    }
-
-    startGame = () => {
-        this.setState({
-            isGamePlaying: true
-        });
-        this.countDown();
+    incrementCountDownNumber = () => {
+        this.setState((prevState) =>({
+            displayedNumber: this.state.numbersToAdd[this.state.indexToDisplay],
+            indexToDisplay: prevState.indexToDisplay + 1,
+            runningTotal: prevState.runningTotal + this.state.numbersToAdd[this.state.indexToDisplay]                    
+        }));
     }
 
     handleDifficultyChange = (event) => {
@@ -157,38 +174,43 @@ export class Game extends React.Component {
     }
 
     render() {
-        let { isGamePlaying } = this.state;
+        let { isGamePlaying,
+            fadeClass,
+            displayedNumber,
+            buttonLabel,
+            selectedDifficultyOption,
+            selectedSpeedOption } = this.state;
+
         if (isGamePlaying) {
             return (
-                <div className="col-md-4 offset-md-4 text-center div-border">
-                    <CountDownNumber displayedNumber={this.state.displayedNumber} />
-                    <PushButton onClick={this.claimAnswer} buttonText={"STOP"} targetNumber={this.state.targetNumber} />
+                <div className="col-md-4 offset-md-4 text-center main-container">
+                    <div className="display-wrap">
+                        <CountDownNumber displayedNumber={displayedNumber} fadeClass={fadeClass} />
+                    </div>
+                    <PushButton onClick={this.claimAnswer} buttonText={buttonLabel} />
                     <br />
                     <Button onClick={this.resetToZero} text={"Reset Game"} /> 
-                    <br />
-                    <Message message={this.state.message} />
                 </div>
             )
         } else {
             return (
-                <div className="col-md-4 offset-md-4 text-center div-border">
-                    <DifficultyRadioButtons label1="Easy" 
-                                            label2="Medium" 
-                                            label3="Hard"
-                                            selectedOption={this.state.selectedDifficultyOption} 
-                                            onChange={this.handleDifficultyChange} />
-                    <DifficultyRadioButtons label1="Slow"
-                                            label2="Steady"
-                                            label3="Fast"
-                                            selectedOption={this.state.selectedSpeedOption}
-                                            onChange={this.handleSpeedChange} />
-                    <PushButton onClick={this.startGame} buttonText={"Start Countdown"} targetNumber={this.state.targetNumber} />
-                    <ResetGameLink onClick={this.setNewTarget} />
-                    <p>{this.state.targetNumber} </p>
+                <div className="col-md-4 offset-md-4 text-center main-container">
+                    <div className="display-wrap">
+                        <DifficultyRadioButtons label1="Easy" 
+                                                label2="Medium" 
+                                                label3="Hard"
+                                                selectedOption={selectedDifficultyOption} 
+                                                onChange={this.handleDifficultyChange} />
+                        <DifficultyRadioButtons label1="Slow"
+                                                label2="Steady"
+                                                label3="Fast"
+                                                selectedOption={selectedSpeedOption}
+                                                onChange={this.handleSpeedChange} />
+                    </div>                   
+                    <PushButton onClick={this.startGame} buttonText={buttonLabel} />
                 </div>               
             )
         }
-        
     }        
 }
 

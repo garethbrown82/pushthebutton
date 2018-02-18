@@ -5,7 +5,6 @@ export const PushButton = (props) => {
         <div>
             <button className="btn btn-primary btn-lg btn-block" onClick={props.onClick}>
                 <p>{props.buttonText}</p>
-                <p>Target: {props.targetNumber}</p>
             </button>
         </div>
         
