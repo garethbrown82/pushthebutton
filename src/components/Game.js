@@ -17,7 +17,9 @@ export class Game extends React.Component {
             indexToDisplay: 0,
             showNumTimeout: 0,
             fadeTimeout: 0,
+            startGameTimeout: 0,
             isGamePlaying: false,
+            isButtonDisabled: false,
             selectedDifficultyOption: "easy",
             selectedSpeedOption: "slow",
             gameSpeed: Speed.STEADY,
@@ -52,11 +54,13 @@ export class Game extends React.Component {
             targetNumber: targetNumber,
             numbersToAdd: numbersToAdd,
             buttonLabel: "Stop when total is: " + targetNumber
+            
         })
     }
 
     claimAnswer = () => {
         clearTimeout(this.state.showNumTimeout);
+        clearTimeout(this.state.fadeTimeout);
         if (this.state.indexToDisplay === this.state.numbersToAdd.length-1) {
             this.setState({
                 buttonLabel: "Well Done!"
@@ -70,18 +74,23 @@ export class Game extends React.Component {
     }
 
     startGame = () => {
+        const { isGameStarting, targetNumber } = this.state;
+        this.setState({
+            isButtonDisabled: true
+        })
         this.setNumberSequence();
         setTimeout(
             () => {
                 this.setState({
                     isGamePlaying: true,
                     displayedNumber: "Ready!",
-                    buttonLabel: "Total = " + this.state.targetNumber
+                    buttonLabel: "Total = " + this.state.targetNumber,
+                    isButtonDisabled: false
                 });
                 this.countDown();
             },
             3500
-        )      
+        )
     }
 
     countDown = () => {
@@ -179,7 +188,8 @@ export class Game extends React.Component {
             displayedNumber,
             buttonLabel,
             selectedDifficultyOption,
-            selectedSpeedOption } = this.state;
+            selectedSpeedOption,
+            isButtonDisabled } = this.state;
 
         if (isGamePlaying) {
             return (
@@ -207,7 +217,7 @@ export class Game extends React.Component {
                                                 selectedOption={selectedSpeedOption}
                                                 onChange={this.handleSpeedChange} />
                     </div>                   
-                    <PushButton onClick={this.startGame} buttonText={buttonLabel} />
+                    <PushButton onClick={this.startGame} buttonText={buttonLabel} isButtonDisabled={isButtonDisabled} />
                 </div>               
             )
         }
