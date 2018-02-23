@@ -30,7 +30,7 @@ export class Game extends React.Component {
             fadeClass: 'show',
             buttonClass: 'btn-primary',
             progressPercent: 0,
-            isProgressBarVisible: true
+            isProgressBarVisible: false
         };
 
         this.handleDifficultyChange = this.handleDifficultyChange.bind(this);

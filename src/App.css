@@ -72,11 +72,12 @@ body {
 }
 
 .main-container {
-  border: solid 1px black;
   width: 200px;
   height: 400px;
   padding-top: 15px;
   padding-bottom: 15px;
+  border-radius: 3%;
+  border: solid 1px rgb(167, 167, 167)
 }
 
 .countdown-number {
