@@ -9,7 +9,9 @@ export const PushButton = (props) => {
     
     return (
         <div>
-            <button className={classList.join(' ')} disabled={props.isButtonDisabled} onClick={props.onClick}>
+            <button className={classList.join(' ')} 
+                    disabled={props.isButtonDisabled} 
+                    onClick={props.onClick} >
                 <p>{props.buttonText}</p>
             </button>
         </div>

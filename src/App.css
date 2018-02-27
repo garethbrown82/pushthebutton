@@ -73,16 +73,21 @@ body {
 
 .main-container {
   width: 200px;
-  height: 400px;
+  height: auto;
   padding-top: 15px;
   padding-bottom: 15px;
   border-radius: 3%;
   border: solid 1px rgb(167, 167, 167)
 }
 
-.countdown-number {
-  font-size: 5rem;
+.large-text {
+  padding-top: 1rem;
+  font-size: 6rem;
+}
+
+.small-text {
   padding-top: 2rem;
+  font-size: 3rem;
 }
 
 .show {
@@ -90,6 +95,13 @@ body {
   -o-animation: fadein .5s;
   -moz-animation: fadein .5s;
   -webkit-animation: fadein .5s;
+}
+
+.fade {
+  animation: drop-down .2s;
+  -o-animation: drop-down .2s;
+  -moz-animation: drop-down .2s;
+  -webkit-animation: drop-down .2s;
 }
 
 button p {
@@ -112,10 +124,10 @@ button p {
     background-color: #5cb85c;
     border-radius: .25rem;
     margin-left: 5%;
-    animation: showProgress 3s linear;
-    -o-animation: showProgress 3s linear;
-    -moz-animation: showProgress 3s linear;
-    -webkit-animation: showProgress 3s linear;
+    animation: show-progress 3s linear;
+    -o-animation: show-progress 3s linear;
+    -moz-animation: show-progress 3s linear;
+    -webkit-animation: show-progress 3s linear;
 }
 
 .btn {
@@ -128,7 +140,12 @@ button p {
   to { opacity: 1; }
 }
 
-@Keyframes showProgress {
+@Keyframes show-progress {
   from { width: 0%; }
   to { width: 90%; }
+}
+
+@keyframes drop-down {
+  from { transform: translate(0); }
+  to { transform: translate(0, 20px); }
 }

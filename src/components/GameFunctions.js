@@ -10,12 +10,8 @@ export class GameFunctions {
         for (let i=0; i < numTargetSplitInto; i++) {
             unorderedDividers.push(randomNumberBetween(1, targetNumber));
         }
-        console.log("unorderedDivider");
-        console.log(unorderedDividers);
         const orderedDividers = unorderedDividers.sort((a, b) => a-b);
        
-        console.log("orderedDividers");
-        console.log(orderedDividers);
         let numbersToAdd = [];
         numbersToAdd.push(orderedDividers[0]);
 
@@ -24,13 +20,6 @@ export class GameFunctions {
             numbersToAdd.push(orderedDividers[i]-prevDivider);
         }
         numbersToAdd.push(targetNumber-orderedDividers[orderedDividers.length-1]);
-        console.log("targetNumber");
-        console.log(targetNumber);
-        console.log("numbersToAdd");
-        console.log(numbersToAdd);
-        console.log("total for numbers to add:");
-        console.log(numbersToAdd.reduce((value, total) => total += value));
-        
         numbersToAdd = removeZeros(numbersToAdd);
         return numbersToAdd;
     }
