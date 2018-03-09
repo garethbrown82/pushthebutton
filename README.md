@@ -1,3 +1,12 @@
+## Push The Button
+
+A game for students to learn quick mental addition by adding the numbers as they appear and clicking the button when the correct total is reached.
+
+Setup instructions:
+
+This project uses Create React App. First download the NPM modules by opening a console in the root and typeing the 'npm install' command. Then the App can be started by typing the 'npm start' command. More details about Create React App can be found below.
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
